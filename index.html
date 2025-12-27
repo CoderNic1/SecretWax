@@ -983,13 +983,13 @@
   // Firebase imports (add these at the very top of the script, after opening <script> tag)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+import { getAuth, signInAnonymously } from "firebase/auth"; const auth = getAuth(); signInAnonymously(auth) .catch((error) => { console.error("Auth error:", error); });
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-import { getAuth, signInAnonymously } from "firebase/auth"; const auth = getAuth(); signInAnonymously(auth) .catch((error) => { console.error("Auth error:", error); });
+
 
 // State Management
 let gameState = {
