@@ -1016,12 +1016,15 @@ let gameState = {
     discordUnlocked: false
 };
 
+
 // Load state from localStorage
 function loadState() {
     const saved = localStorage.getItem('secretTerminalState');
     if (saved) {
         gameState = { ...gameState, ...JSON.parse(saved) };
     }
+
+    document.getElementById('close-alert-btn').addEventListener('click', closeAlert);
 }
 
 // Save state to localStorage
