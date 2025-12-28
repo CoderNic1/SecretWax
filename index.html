@@ -979,9 +979,9 @@
     appId: "1:19692324028:web:06aa3ea5d2e368fb257cb9"
   };
 
-  // Initialize Firebase
-  const db = getFirestore(app);
+  // Initialize Firebase.
   const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
   const auth = getAuth(app);
 
   signInAnonymously(auth)
