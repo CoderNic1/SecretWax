@@ -1601,7 +1601,6 @@ function checkMissionAnswer(mission, userAnswer) {
         gameState.completedMissions.push(mission.id);
         gameState.systemIntegrity = Math.min(100, gameState.systemIntegrity + 5);
         showAlert('AWESOME', '✓ MISSION COMPLETED!\n\n' + mission.reward);
-        alert(');
         saveState();
         updateStatus();
         updateMissions();
