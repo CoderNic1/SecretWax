@@ -857,178 +857,6 @@
 .alert-overlay.active {
     display: block;
 }
-
-.popup.hidden { display: none; }
-.popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.popup-content {
-  background: #111;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  color: white;
-}
-
-.agent-button {
-  background: transparent;
-  color: #00eaff;
-  border: 1px solid #00eaff;
-  padding: 8px 16px;
-  font-size: 14px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: "Consolas", "Courier New", monospace;
-}
-
-.agent-button:hover {
-  background: rgba(0, 234, 255, 0.1);
-  box-shadow: 0 0 8px #00eaff;
-}
-
-.agent-button:active {
-  background: rgba(0, 234, 255, 0.2);
-  transform: scale(0.97);
-}
-
-.agent-settings-btn {
-  background: transparent;
-  border: 1px solid #00eaff;
-  color: #00eaff;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  font-family: "Consolas", "Courier New", monospace;
-}
-
-.agent-settings-btn:hover {
-  background: rgba(0, 234, 255, 0.1);
-  box-shadow: 0 0 8px #00eaff;
-}
-
-.agent-settings-btn:active {
-  background: rgba(0, 234, 255, 0.2);
-  transform: scale(0.97);
-}
-/* Overlay */
-#agent-setup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 255, 128, 0.05); /* subtle green glow */
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-/* Popup box */
-.popup-content {
-  background: #0a0f0c;
-  border: 1px solid #00ff99;
-  box-shadow: 0 0 12px #00ff99;
-  padding: 24px;
-  border-radius: 8px;
-  width: 320px;
-  text-align: center;
-  color: #00ff99;
-  font-family: 'Courier New', Courier, monospace;
-}
-
-/* Heading */
-.popup-content h2 {
-  font-size: 20px;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* Description */
-.popup-content p {
-  font-size: 14px;
-  margin-bottom: 20px;
-  color: #66ffcc;
-}
-
-/* Input field */
-#agentNameInput {
-  width: 100%;
-  padding: 8px 12px;
-  margin-bottom: 16px;
-  background: #000;
-  border: 1px solid #00ff99;
-  color: #00ff99;
-  font-family: inherit;
-  font-size: 14px;
-  border-radius: 4px;
-  outline: none;
-}
-
-/* Buttons */
-.popup-content button {
-  background: transparent;
-  border: 1px solid #00ff99;
-  color: #00ff99;
-  padding: 8px 16px;
-  margin: 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.2s ease;
-}
-
-.popup-content button:hover {
-  background: rgba(0, 255, 128, 0.1);
-  box-shadow: 0 0 8px #00ff99;
-}
-
-.popup-content button:active {
-  background: rgba(0, 255, 128, 0.2);
-  transform: scale(0.97);
-}
-/* SETTINGS MENU OVERLAY */
-#settings-menu {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 255, 128, 0.05); /* subtle green tint */
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999; /* same layer as mission brief */
-}
-
-/* Hidden state */
-#settings-menu.hidden {
-  display: none;
-}
-
-/* SETTINGS CONTENT BOX */
-.settings-content {
-  background: #0a0f0c;
-  border: 1px solid #00ff99;
-  box-shadow: 0 0 12px #00ff99;
-  padding: 24px;
-  border-radius: 8px;
-  width: 320px;
-  text-align: center;
-  color: #00ff99;
-  font-family: 'Courier New', Courier, monospace;
-}
-
-
     </style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -1071,13 +899,6 @@
                 <span class="status-label">NETWORK NODES</span>
                 <span class="status-value" id="network-nodes">0/20</span>
             </div>
-                <div class="header-actions">
-                  <button class="agent-settings-btn" onclick="toggleSettingsMenu()">
-                    ⚙️
-                  </button>
-                </div>
-
-              
         </div>
         
         <nav class="nav-tabs">
@@ -1190,38 +1011,6 @@
     <p style="margin-top: 20px; color: var(--warning-orange);"><strong>Remember, operative: Speed and precision are essential. The network is watching.</strong></p>
     <button class="close-modal-btn" onclick="closeMissionBrief()">ACKNOWLEDGED</button>
 </div>
-
-<div id="agent-setup" class="popup hidden">
-    <div class="popup-content">
-      <h2>Welcome, Recruit</h2>
-      <p>Choose your codename to begin your mission. This will be your personal codename for all the missions </p>
-  
-      <input id="agentNameInput" type="text" placeholder="Enter codename">
-  
-      <button id="saveAgentName">Confirm Codename</button>
-      <button id="continueAnonymous">Continue as Anonymous Agent</button>
-    </div>
-  </div>
-
-  <div id="settings-menu" class="settings-modal hidden">
-    <div class="settings-content">
-      <h2>Agent Settings</h2>
-  
-      <button class="agent-button" onclick="showAgentSetupPopup()">
-        Change Codename
-      </button>
-  
-      <button class="agent-button" onclick="resetAgentIdentity()">
-        Reset Identity
-      </button>
-  
-      <button class="agent-button" onclick="closeSettingsMenu()">
-        Close
-      </button>
-    </div>
-  </div>
-  
-
      </div>
  
 
@@ -2049,7 +1838,6 @@ updateMissions();
 updateNetworkMap();
 updateClues();
 updateCooldownDisplay();
-checkFirstVisit();
 
 const closeAlertBtn = document.getElementById('close-alert-btn');
     if (closeAlertBtn) {
@@ -2079,75 +1867,6 @@ window.closeMissionBrief = function() {
 document.getElementById('brief-overlay').addEventListener('click', () => {
     closeMissionBrief();
 });
-
-// introducing personalization of the experience
-window.getAgentName = function () {
-  return localStorage.getItem("agentName") || "Anonymous Agent";
-};
-
-window.setAgentName = function (name) {
-  if (!name || name.trim() === "") {
-    localStorage.setItem("agentName", "Anonymous Agent");
-  } else {
-    localStorage.setItem("agentName", name.trim());
-  }
-};
-
-window.clearAgentName = function () {
-  localStorage.removeItem("agentName");
-};
-
-function checkFirstVisit() {
-  if (!localStorage.getItem("agentName")) {
-    showAgentSetupPopup();
-  }
-}
-
-
-window.showAgentSetupPopup = function () {
-    closeSettingsMenu()
-  document.getElementById("agent-setup").classList.remove("hidden");
-
-  document.getElementById("saveAgentName").onclick = () => {
-    const name = document.getElementById("agentNameInput").value;
-    setAgentName(name);
-    closeAgentSetupPopup();
-    showAlert("🕵️ Codename Set", `Welcome, Agent ${getAgentName()}.`);
-  };
-
-  document.getElementById("continueAnonymous").onclick = () => {
-    setAgentName("Anonymous Agent");
-    closeAgentSetupPopup();
-    showAlert("🕶 Operating Anonymously", "You may set a codename later.");
-  };
-};
-
-window.closeAgentSetupPopup = function () {
-  document.getElementById("agent-setup").classList.add("hidden");
-};
-
-window.toggleSettingsMenu = function () {
-  const menu = document.getElementById("settings-menu");
-  menu.classList.toggle("hidden");
-};
-
-window.closeSettingsMenu = function () {
-  document.getElementById("settings-menu").classList.add("hidden");
-};
-
-window.resetAgentIdentity = function () {
-closeSettingsMenu()
-  clearAgentName();
-  closeSettingsMenu();
-  showAgentSetupPopup();
-};
-
-window.toggleSettingsMenu = function () {
-  const menu = document.getElementById("settings-menu");
-  menu.classList.toggle("hidden");
-};
-
-
     </script>
 </body>
 </html>
