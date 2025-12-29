@@ -1283,35 +1283,55 @@ async function getRewardFromFirestore(code) {
 }
 
 async function claimRewardInFirestore(code) {
-    try {
-        const ref = doc(db, "rewards", code);
+  try {
+    const ref = doc(db, "rewards", code);
 
-        return await runTransaction(db, async (transaction) => {
-            const snap = await transaction.get(ref);
+    return await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(ref);   // 🔹 1 read
 
-            if (!snap.exists()) {
-                return { success: false, reason: "not_found" };
-            }
+      if (!snap.exists()) {
+        return { success: false, reason: "not_found" };
+      }
 
-            const data = snap.data();
+      const data = snap.data();
 
-            if (data.claimed) {
-                return { success: false, reason: "already_claimed" };
-            }
+      //  Already claimed?
+      if (data.claimed) {
+        return { success: false, reason: "already_claimed" };
+      }
 
-            transaction.update(ref, {
-                claimed: true,
-                claimedBy: "anonymous Agent",
-                claimedAt: Date.now()
-            });
+      const now = Date.now();
 
-            return { success: true };
-        });
-    } catch (error) {
-        console.error("Error claiming reward:", error);
-        return { success: false, reason: "error", error: error.message };
-    }
+      // Check ValidFrom (if present)
+      if (data.ValidFrom && now < data.ValidFrom) {
+        return { success: false, reason: "too_early" };
+        showAlert("⏳ TOO EARLY", "This reward is not available yet.");
+      }
+
+      // Check ValidTill (if present)
+      if (data.ValidTill && now > data.ValidTill) {
+        return { success: false, reason: "expired" };
+        showAlert("⌛ EXPIRED", "This reward is no longer valid.");
+      }
+
+      //  All good — claim it
+      transaction.update(ref, {
+        claimed: true,
+        claimedBy: "anonymous Agent",
+        claimedAt: now
+      });
+
+      return { success: true };
+    });
+
+  } catch (error) {
+    console.error("Error claiming reward:", error);
+    return { success: false, reason: "error", error: error.message };
+    showAlert("⚠ ERROR", "Something went wrong. Please try again or contact the website owner.");
+  }
 }
+
+
 
 // Submit Code (FIXED: Made async and fixed error handling)
 document.getElementById('submit-code').addEventListener('click', async () => {
