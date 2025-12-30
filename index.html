@@ -1287,49 +1287,61 @@ async function claimRewardInFirestore(code) {
     const ref = doc(db, "rewards", code);
 
     return await runTransaction(db, async (transaction) => {
-      const snap = await transaction.get(ref);   // 🔹 1 read
+      const snap = await transaction.get(ref);
 
       if (!snap.exists()) {
+        showAlert("❌ UNKNOWN CODE", "This code does not exist.");
         return { success: false, reason: "not_found" };
       }
 
       const data = snap.data();
+      const now = Date.now();
 
-      //  Already claimed?
-      if (data.claimed) {
+      // Unique claim check
+      if (data.UniqueClaim === true && data.claimed === true) {
+        showAlert("⚠ ALREADY CLAIMED", "This reward has already been claimed.");
         return { success: false, reason: "already_claimed" };
       }
 
-      const now = Date.now();
-
-      // Check ValidFrom (if present)
+      // ValidFrom check
       if (data.ValidFrom && now < data.ValidFrom) {
-        return { success: false, reason: "too_early" };
         showAlert("⏳ TOO EARLY", "This reward is not available yet.");
+        return { success: false, reason: "too_early" };
       }
 
-      // Check ValidTill (if present)
+      // ValidTill check
       if (data.ValidTill && now > data.ValidTill) {
-        return { success: false, reason: "expired" };
         showAlert("⌛ EXPIRED", "This reward is no longer valid.");
+        return { success: false, reason: "expired" };
       }
 
-      //  All good — claim it
-      transaction.update(ref, {
-        claimed: true,
-        claimedBy: "anonymous Agent",
-        claimedAt: now
-      });
+      // Write logic
+      if (data.UniqueClaim === true) {
+        // Unique reward → mark as claimed
+        transaction.update(ref, {
+          claimed: true,
+          claimedBy: "anonymous Agent",
+          claimedAt: now
+        });
+      } else {
+        // Non-unique reward → allow infinite claims
+        transaction.update(ref, {
+          claimedBy: "anonymous Agent",
+          claimedAt: now
+        });
+      }
 
+      showAlert("🎉 SUCCESS", "Reward successfully claimed.");
       return { success: true };
     });
 
   } catch (error) {
     console.error("Error claiming reward:", error);
-    return { success: false, reason: "error", error: error.message };
     showAlert("⚠ ERROR", "Something went wrong. Please try again or contact the website owner.");
+    return { success: false, reason: "error", error: error.message };
   }
 }
+
 
 
 
