@@ -1557,7 +1557,9 @@ let gameState = {
     worldState: 'unstable',
     discordUnlocked: false,
     logbookCache: {},  // Cache for reward data: { code: { data, timestamp } }
-    lastCacheRefresh: null  // Timestamp of last full cache refresh
+    lastCacheRefresh: null,  // Timestamp of last full cache refresh
+    firstFailedAttemptTime: null,  // Timestamp of first failed attempt in current window
+    failedAttemptsInWindow: 0  // Number of failed attempts within 1-hour window
 };
 
 // Cache configuration
@@ -1577,6 +1579,12 @@ function loadState() {
     if (!gameState.lastCacheRefresh) {
         gameState.lastCacheRefresh = null;
     }
+    if (gameState.firstFailedAttemptTime === undefined) {
+        gameState.firstFailedAttemptTime = null;
+    }
+    if (gameState.failedAttemptsInWindow === undefined) {
+        gameState.failedAttemptsInWindow = 0;
+    }
 }
 
 // Save state to localStorage
@@ -1587,7 +1595,41 @@ function saveState() {
 // Initialize
 loadState();
 
+// Calculate lockout time with escalating penalties
+function calculateLockoutTime() {
+    const now = Date.now();
+    const ONE_HOUR_MS = 3600000; // 1 hour in milliseconds
+    const ESCALATION_MS = 300000; // 5 minutes per failed attempt
+    const BASE_LOCKOUT_MS = 300000; // 5 minutes base
+    const MIN_LOCKOUT_MS = 120000; // 2 minutes minimum
+    
+    // Mission reduction (30 seconds per mission)
+    const reduction = gameState.completedMissions.length * 30000;
+    // Calculate base lockout time (reduced by completed missions)
+    const baseLockout = Math.max(MIN_LOCKOUT_MS, BASE_LOCKOUT_MS - reduction);
+    
+    // Check if we're still within the 1-hour window
+    if (gameState.firstFailedAttemptTime && (now - gameState.firstFailedAttemptTime) < ONE_HOUR_MS) {
+        // Still within window - increment counter and calculate escalated time
+        gameState.failedAttemptsInWindow++;
+        // Escalation: base + (attempts - 1) * 5 minutes
+        const escalatedLockout = BASE_LOCKOUT_MS + ((gameState.failedAttemptsInWindow - 1) * ESCALATION_MS);
+        
+        // The lower wait time should always apply (as user requested)
+        // This means if base (after mission reduction) is lower, use base instead of escalated
+        return Math.min(baseLockout, escalatedLockout);
+    } else {
+        // Window expired or doesn't exist - reset and start fresh with base time
+        gameState.firstFailedAttemptTime = now;
+        gameState.failedAttemptsInWindow = 1;
+        return baseLockout;
+    }
+}
 
+function resetFailedAttemptWindow() {
+    gameState.firstFailedAttemptTime = null;
+    gameState.failedAttemptsInWindow = 0;
+}
 
 function showAlert(title, message) {
     document.getElementById('alert-title').textContent = title;
@@ -1964,6 +2006,28 @@ document.getElementById('submit-code').addEventListener('click', async () => {
                 // Try to claim in Firestore
             const claimResult = await claimRewardInFirestore(code);
 
+            // Check if claim failed due to timing issues (too early or expired)
+            if (!claimResult.success && (claimResult.reason === "too_early" || claimResult.reason === "expired")) {
+                // Treat as failed attempt - trigger lockout
+                gameState.failedAttempts++;
+                gameState.systemIntegrity = Math.max(0, gameState.systemIntegrity - 5);
+                
+                // Calculate lockout time with escalating penalties
+                const lockoutMs = calculateLockoutTime();
+                
+                gameState.lockoutEnd = Date.now() + lockoutMs;
+                
+                saveState();
+                updateStatus();
+                showLockout();
+                
+                // Check for threat events
+                if (gameState.failedAttempts >= 3) {
+                    triggerThreatEvent();
+                }
+                return;
+            }
+
             // Even if already claimed, we still count it for progress
             if (claimResult.reason === "already_claimed") {
                  // Don't show error, just mark as claimed in the match data
@@ -1972,6 +2036,28 @@ document.getElementById('submit-code').addEventListener('click', async () => {
                     match.claimedAt = Date.now(); // Approximate
                 }
 
+            // Only proceed if claim was successful or already claimed
+            if (!claimResult.success && claimResult.reason !== "already_claimed") {
+                // Unknown error - treat as failed attempt
+                gameState.failedAttempts++;
+                gameState.systemIntegrity = Math.max(0, gameState.systemIntegrity - 5);
+                
+                // Calculate lockout time with escalating penalties
+                const lockoutMs = calculateLockoutTime();
+                
+                gameState.lockoutEnd = Date.now() + lockoutMs;
+                
+                saveState();
+                updateStatus();
+                showLockout();
+                
+                // Check for threat events
+                if (gameState.failedAttempts >= 3) {
+                    triggerThreatEvent();
+                }
+                return;
+            }
+
                 // Cache the data immediately (link removed for unique claims)
                 setCachedRewardData(code, match);
 
@@ -1979,6 +2065,7 @@ document.getElementById('submit-code').addEventListener('click', async () => {
                 gameState.redeemedCodes.push(code);
                 gameState.systemIntegrity = Math.min(100, gameState.systemIntegrity + 10);
                 gameState.failedAttempts = 0;
+                resetFailedAttemptWindow(); // Reset escalation window on successful code
 
                 // Set cooldown (1 hour)
                 const cooldownMs = Math.max(600000, 3600000 - (gameState.completedMissions.length * 600000));
@@ -2007,10 +2094,8 @@ document.getElementById('submit-code').addEventListener('click', async () => {
             gameState.failedAttempts++;
             gameState.systemIntegrity = Math.max(0, gameState.systemIntegrity - 5);
             
-            // Calculate lockout time
-            const baseLockout = 300000; // 5 minutes
-            const reduction = gameState.completedMissions.length * 30000;
-            const lockoutMs = Math.max(120000, baseLockout - reduction);
+            // Calculate lockout time with escalating penalties
+            const lockoutMs = calculateLockoutTime();
             
             gameState.lockoutEnd = Date.now() + lockoutMs;
             
@@ -2944,7 +3029,9 @@ window.handleClearData = function() {
         worldState: 'unstable',
         discordUnlocked: false,
         logbookCache: {},
-        lastCacheRefresh: null
+        lastCacheRefresh: null,
+        firstFailedAttemptTime: null,
+        failedAttemptsInWindow: 0
     };
     
     // Update UI
