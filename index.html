@@ -1429,6 +1429,9 @@
     background: rgba(0, 255, 65, 0.05);
     cursor: pointer;
     transition: all 0.2s;
+    position: absolute;
+    top: 20px;
+    right: 20px;
 }
 #wax-connected-badge.visible { display: inline-flex; }
 #wax-connected-badge:hover {
@@ -1506,6 +1509,10 @@
         <header class="terminal-header">
             <h1>◈ SECRET CODE TERMINAL ◈</h1>
             <p class="subtitle">CLASSIFIED ACCESS PROTOCOL ENGAGED</p>
+            <div id="wax-connected-badge">
+                <span class="wax-badge-dot"></span>
+                <span id="wax-badge-address">NOT CONNECTED</span>
+            </div>
         </header>
         
         <div class="system-status">
