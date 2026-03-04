@@ -546,32 +546,6 @@
             box-shadow: 0 0 10px var(--primary-green);
         }
         
-        /* Encrypted Clues */
-        .clue-container {
-            background: rgba(10, 14, 20, 0.9);
-            border: 2px solid var(--warning-orange);
-            border-radius: 5px;
-            padding: 20px;
-            margin: 20px 0;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .clue-text {
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--warning-orange);
-            text-align: center;
-            font-size: 1.1em;
-            letter-spacing: 2px;
-            animation: scramble 0.5s;
-        }
-        
-        @keyframes scramble {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
         /* Threat Warning */
         .threat-warning {
             position: fixed;
@@ -1276,10 +1250,243 @@
 .alert-overlay.active {
     display: block;
 }
+
+/* ═══════════════════════════════════════
+   WAX WALLET LOGIN GATE
+═══════════════════════════════════════ */
+
+/* Full-screen blocking overlay */
+#wax-login-gate {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 16, 0.97);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#wax-login-gate.hidden {
+    display: none;
+}
+
+.wax-login-box {
+    background: var(--bg-dark);
+    border: 2px solid var(--primary-green);
+    border-radius: 5px;
+    padding: 50px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(0, 255, 65, 0.15), inset 0 0 40px rgba(0, 255, 65, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated corner decorations */
+.wax-login-box::before,
+.wax-login-box::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: var(--primary-green);
+    border-style: solid;
+}
+.wax-login-box::before { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+.wax-login-box::after  { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+.wax-login-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75em;
+    letter-spacing: 4px;
+    color: var(--warning-orange);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.wax-login-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6em;
+    font-weight: 900;
+    color: var(--primary-green);
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px var(--primary-green);
+    margin-bottom: 10px;
+    animation: flicker 3s infinite;
+}
+
+.wax-login-sub {
+    color: #666;
+    font-size: 0.85em;
+    margin-bottom: 35px;
+    line-height: 1.6;
+    letter-spacing: 1px;
+}
+
+/* Wallet connect buttons */
+.wax-wallet-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 15px 20px;
+    background: rgba(10, 14, 20, 0.9);
+    border: 1px solid var(--primary-green);
+    color: var(--primary-green);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 12px;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.wax-wallet-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.06), transparent);
+    transition: left 0.5s;
+}
+
+.wax-wallet-btn:hover::before { left: 100%; }
+
+.wax-wallet-btn:hover {
+    background: rgba(0, 255, 65, 0.08);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    transform: translateX(3px);
+}
+
+.wax-wallet-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.wax-wallet-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid rgba(0, 255, 65, 0.3);
+}
+
+.wax-wallet-info { flex: 1; }
+.wax-wallet-name { font-size: 0.95em; margin-bottom: 2px; }
+.wax-wallet-desc { font-size: 0.7em; color: #555; font-family: 'Share Tech Mono', monospace; font-weight: normal; text-transform: none; letter-spacing: 0; }
+
+.wax-login-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 16px;
+    color: #444;
+    font-size: 0.75em;
+    letter-spacing: 2px;
+}
+.wax-login-divider::before,
+.wax-login-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #222;
+}
+
+/* Status line under buttons */
+#wax-login-status {
+    margin-top: 20px;
+    min-height: 20px;
+    font-size: 0.8em;
+    color: var(--warning-orange);
+    letter-spacing: 1px;
+    font-family: 'Share Tech Mono', monospace;
+    animation: flicker 2s infinite;
+}
+
+/* Connected wallet indicator in topbar area */
+#wax-connected-badge {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8em;
+    color: var(--primary-green);
+    padding: 6px 12px;
+    border: 1px solid var(--primary-green);
+    border-radius: 3px;
+    background: rgba(0, 255, 65, 0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+#wax-connected-badge.visible { display: inline-flex; }
+#wax-connected-badge:hover {
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+}
+
+.wax-badge-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--primary-green);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--primary-green);
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--primary-green); }
+    50%       { opacity: 0.4; box-shadow: 0 0 3px var(--primary-green); }
+}
     </style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <body>
+
+
+    <div id="wax-login-gate">
+        <div class="wax-login-box">
+            <div class="wax-login-logo">⬡ AUTHENTICATION REQUIRED</div>
+            <div class="wax-login-title">CONNECT WALLET</div>
+            <p class="wax-login-sub">
+                IDENTITY VERIFICATION REQUIRED<br>
+                Connect your WAX wallet to access<br>the classified terminal.
+            </p>
+    
+            <button class="wax-wallet-btn" id="wax-btn-anchor">
+                <div class="wax-wallet-icon">⚓</div>
+                <div class="wax-wallet-info">
+                    <div class="wax-wallet-name">ANCHOR WALLET</div>
+                    <div class="wax-wallet-desc">Desktop & mobile EOSIO authenticator</div>
+                </div>
+                <span>→</span>
+            </button>
+    
+            <div class="wax-login-divider"><span>OR</span></div>
+    
+            <button class="wax-wallet-btn" id="wax-btn-cloud">
+                <div class="wax-wallet-icon">☁</div>
+                <div class="wax-wallet-info">
+                    <div class="wax-wallet-name">MY CLOUD WALLET</div>
+                    <div class="wax-wallet-desc">Web-based WAX wallet login</div>
+                </div>
+                <span>→</span>
+            </button>
+    
+            <div id="wax-login-status">[ AWAITING AUTHENTICATION ]</div>
+        </div>
+    </div>
+
     <canvas id="matrix-canvas"></canvas>
     <div class="scanline"></div>
     <div class="glitch-overlay"></div>
@@ -1325,7 +1532,6 @@
             <button class="nav-tab" data-section="logbook">LOG BOOK</button>
             <button class="nav-tab" data-section="missions">SIDE MISSIONS</button>
             <button class="nav-tab" data-section="network">NETWORK MAP</button>
-            <button class="nav-tab" data-section="clues">ENCRYPTED CLUES</button>
         </nav>
         
         <!-- Warning Box -->
@@ -1385,13 +1591,6 @@
         <section class="section" id="network-section">
             <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Orbitron', monospace;">NETWORK INFILTRATION MAP</h2>
             <div class="network-map" id="network-map"></div>
-        </section>
-        
-        <!-- Encrypted Clues Section -->
-        <section class="section" id="clues-section">
-            <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Orbitron', monospace;">INTERCEPTED TRANSMISSIONS</h2>
-            <div id="clues-container"></div>
-            <p id="no-clues" style="text-align: center; color: #666; margin-top: 20px;">No transmissions intercepted. Continue your mission to unlock encrypted data.</p>
         </section>
 
         <!-- Discord Unlock Modal -->
@@ -1553,7 +1752,6 @@ let gameState = {
     systemIntegrity: 50,
     failedAttempts: 0,
     lastActivity: Date.now(),
-    encryptedClues: [],
     worldState: 'unstable',
     discordUnlocked: false,
     logbookCache: {},  // Cache for reward data: { code: { data, timestamp } }
@@ -1565,6 +1763,100 @@ let gameState = {
 // Cache configuration
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
+// ═══════════════════════════════════════════════════
+//  WAX WALLET AUTHENTICATION — WharfKit
+// ═══════════════════════════════════════════════════
+import { SessionKit }              from 'https://esm.sh/@wharfkit/session@1'
+import { WebRenderer }             from 'https://esm.sh/@wharfkit/web-renderer@1'
+import { WalletPluginAnchor }      from 'https://esm.sh/@wharfkit/wallet-plugin-anchor@1'
+import { WalletPluginCloudWallet } from 'https://esm.sh/@wharfkit/wallet-plugin-cloudwallet@1'
+
+const WAX_CHAIN = {
+    id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
+    url: 'https://wax.greymass.com',
+}
+
+const wharfRenderer = new WebRenderer()
+const sessionKit = new SessionKit({
+    appName: 'secret-terminal',
+    chains: [WAX_CHAIN],
+    ui: wharfRenderer,
+    walletPlugins: [
+        new WalletPluginAnchor(),
+        new WalletPluginCloudWallet(),
+    ],
+})
+
+// This holds the active WharfKit session
+let waxSession = null
+
+// Returns the connected wallet address, or null
+function getWaxAddress() {
+    return waxSession ? String(waxSession.actor) : null
+}
+
+// Called once wallet is connected — hides the gate, shows badge, unblocks terminal
+function onWaxConnected(session) {
+    waxSession = session
+    const address = String(session.actor)
+
+    // Hide login gate
+    document.getElementById('wax-login-gate').classList.add('hidden')
+
+    // Show connected badge in header
+    const badge = document.getElementById('wax-connected-badge')
+    document.getElementById('wax-badge-address').textContent = address
+    badge.classList.add('visible')
+
+    // Clicking the badge disconnects
+    badge.onclick = async () => {
+        if (confirm('DISCONNECT WALLET?\n\nThis will require re-authentication.')) {
+            await sessionKit.logout().catch(() => {})
+            waxSession = null
+            badge.classList.remove('visible')
+            document.getElementById('wax-login-gate').classList.remove('hidden')
+            document.getElementById('wax-login-status').textContent = '[ AWAITING AUTHENTICATION ]'
+        }
+    }
+
+    console.log('[WAX] Connected as:', address)
+}
+
+// Login handler
+async function waxLogin(walletPlugin) {
+    const statusEl = document.getElementById('wax-login-status')
+    const btnA = document.getElementById('wax-btn-anchor')
+    const btnC = document.getElementById('wax-btn-cloud')
+
+    statusEl.textContent = '[ ESTABLISHING SECURE CONNECTION... ]'
+    btnA.disabled = btnC.disabled = true
+
+    try {
+        const result = await sessionKit.login({ walletPlugin })
+        onWaxConnected(result.session)
+        statusEl.textContent = '[ ACCESS GRANTED ]'
+    } catch (e) {
+        console.error('[WAX login error]', e)
+        statusEl.textContent = '[ CONNECTION FAILED — TRY AGAIN ]'
+        btnA.disabled = btnC.disabled = false
+    }
+}
+
+document.getElementById('wax-btn-anchor').addEventListener('click', () => waxLogin('anchor'))
+document.getElementById('wax-btn-cloud').addEventListener('click',  () => waxLogin('cloudwallet'))
+
+// Restore previous session silently on page load
+;(async () => {
+    try {
+        const restored = await sessionKit.restore()
+        if (restored) {
+            onWaxConnected(restored)
+            console.log('[WAX] Session restored')
+        }
+    } catch (e) {
+        console.warn('[WAX] No session to restore')
+    }
+})()
 
 // Load state from localStorage
 function loadState() {
@@ -1864,16 +2156,16 @@ async function claimRewardInFirestore(code) {
       // Write logic
       if (data.UniqueClaim === true) {
         // Unique reward → mark as claimed
-        transaction.update(ref, {
-          claimed: true,
-          claimedBy: "anonymous Agent",
-          claimedAt: now
-        });
+    transaction.update(ref, {
+    claimed: true,
+    claimedBy: getWaxAddress() || "anonymous",
+    claimedAt: now
+    });
       } else {
         // Non-unique reward → allow infinite claims
         transaction.update(ref, {
-          claimedBy: "anonymous Agent",
-          claimedAt: now
+        claimedBy: getWaxAddress() || "anonymous",
+        claimedAt: now
         });
       }
 
@@ -2079,9 +2371,6 @@ document.getElementById('submit-code').addEventListener('click', async () => {
 
                 // Show success screen (pass code for link fetching if needed)
                 await showSuccess(match, code);
-
-                // Generate new clue
-                generateClue();
 
                 saveState();
                 updateStatus();
@@ -2700,47 +2989,6 @@ function updateNetworkMap() {
     }
 }
 
-// Encrypted Clues
-function generateClue() {
-    const clueTemplates = [
-        'TRANSMISSION INTERCEPTED: ███ ███ BETA',
-        'PARTIAL DECODE: AL█HA ██1',
-        'FREQUENCY ANOMALY DETECTED AT 77.7 MHz',
-        'CIPHER FRAGMENT: ...███...001',
-        'QUANTUM SIGNATURE: ΩΜΕ██ 8█8'
-    ];
-    
-    const clue = clueTemplates[Math.floor(Math.random() * clueTemplates.length)];
-    gameState.encryptedClues.push({
-        text: clue,
-        timestamp: Date.now()
-    });
-    
-    saveState();
-    updateClues();
-}
-
-function updateClues() {
-    const container = document.getElementById('clues-container');
-    const noClues = document.getElementById('no-clues');
-    
-    if (gameState.encryptedClues.length === 0) {
-        noClues.style.display = 'block';
-        container.innerHTML = '';
-        return;
-    }
-    
-    noClues.style.display = 'none';
-    container.innerHTML = '';
-    
-    gameState.encryptedClues.forEach(clue => {
-        const div = document.createElement('div');
-        div.className = 'clue-container';
-        div.innerHTML = `<div class="clue-text">${clue.text}</div>`;
-        container.appendChild(div);
-    });
-}
-
 // Threat Events
 function triggerThreatEvent() {
     const warning = document.querySelector('.threat-warning');
@@ -2900,7 +3148,6 @@ updateStatus();
 updateLogBook();
 updateMissions();
 updateNetworkMap();
-updateClues();
 updateCooldownDisplay();
 updateAgentNameDisplay();
 updateUIPersonalization();
@@ -3025,7 +3272,6 @@ window.handleClearData = function() {
         systemIntegrity: 50,
         failedAttempts: 0,
         lastActivity: Date.now(),
-        encryptedClues: [],
         worldState: 'unstable',
         discordUnlocked: false,
         logbookCache: {},
@@ -3039,7 +3285,6 @@ window.handleClearData = function() {
     updateLogBook();
     updateMissions();
     updateNetworkMap();
-    updateClues();
     updateCooldownDisplay();
     updateResetButtonUI();
     
